@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentic-platform
+  namespace: vitaex
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agentic-platform
+  template:
+    metadata:
+      labels:
+        app: agentic-platform
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/vitaex/agentic-platform:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka.vitaex.svc.cluster.local:9092
+            - name: NEO4J_URI
+              value: bolt://neo4j.vitaex.svc.cluster.local:7687
+            - name: NEO4J_USER
+              valueFrom:
+                secretKeyRef:
+                  name: graph-secrets
+                  key: user
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: graph-secrets
+                  key: password
+            - name: TIMESERIES_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: ts-secrets
+                  key: dsn
+            - name: VECTOR_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: vec-secrets
+                  key: dsn
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-secrets
+                  key: api_key
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.vitaex.svc.cluster.local:4318
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /docs
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /docs
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentic-platform
+  namespace: vitaex
+spec:
+  selector:
+    app: agentic-platform
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timescale
+  namespace: vitaex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timescale
+  template:
+    metadata:
+      labels:
+        app: timescale
+    spec:
+      containers:
+        - name: timescaledb
+          image: timescale/timescaledb-ha:pg16-latest
+          env:
+            - name: POSTGRES_DB
+              value: vitaex
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ts-secrets
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ts-secrets
+                  key: password
+          ports:
+            - containerPort: 5432
+              name: pg
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: timescale
+  namespace: vitaex
+spec:
+  selector:
+    app: timescale
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432

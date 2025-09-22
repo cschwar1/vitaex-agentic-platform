@@ -1,0 +1,182 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: vitaex-kafka
+  namespace: vitaex
+spec:
+  kafka:
+    version: 3.7.0
+    replicas: 3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+    storage:
+      type: ephemeral
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      log.message.format.version: "3.7"
+  zookeeper:
+    replicas: 3
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: ingest.wearables.raw
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 6
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: ingest.wearables.standardized
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 6
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: ingest.labs.standardized
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 6
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: knowledge.research.import.requested
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: knowledge.research.import.completed
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: knowledge.graph.updated
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: user.twin.update.requested
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 6
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: user.twin.updated
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 6
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: simulation.vitality.requested
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: simulation.vitality.completed
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: protocol.generate.requested
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: protocol.generated
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: protocol.review.requested
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: protocol.review.updated
+  namespace: vitaex
+  labels:
+    strimzi.io/cluster: vitaex-kafka
+spec:
+  partitions: 3
+  replicas: 3

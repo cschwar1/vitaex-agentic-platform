@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: vitaex-gateway
+  namespace: vitaex
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "api.vitaex.health"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: agentic-platform-vs
+  namespace: vitaex
+spec:
+  hosts:
+    - "api.vitaex.health"
+  gateways:
+    - vitaex-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /api
+      route:
+        - destination:
+            host: agentic-platform.vitaex.svc.cluster.local
+            port:
+              number: 80
